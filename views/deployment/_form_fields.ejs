@@ -1,0 +1,27 @@
+<div>
+    <label>URL</label>
+    <input type="url" name="url" value="<%=deployment.url%>">
+</div><br>
+<div>    
+    <label>Name</label>
+    <input type="text" name="name" value="<%=deployment.name%>">
+</div><br>
+<div>    
+    <label>Namespace</label>
+    <input type="text" name="namespace" value="<%=deployment.namespace%>">
+</div><br>
+<div>
+    <label>Destination</label>
+    <input type="text" name="destination" value="<%=deployment.destination%>">
+</div><br>
+<div>
+    <label>Date of Deployment</label>
+    <input type="date" name="depDate"
+            value="<%=deployment.depDate == null ? '' :
+            deployment.depDate.toISOString().split('T')[0] %>">
+</div><br>
+<div>
+    <label>Description</label>
+    <textarea name="description"><%=deployment.description%></textarea>
+</div><br>  
+    

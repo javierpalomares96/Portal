@@ -1,6 +1,12 @@
-<h2>Migration</h2>
-<form action="/migration" method="POST">
-    <%- include('_form_fields')%>
-    <a href="/">Cancel</a>
-    <button type="submit">Migrate</button>
+<h2>Search Migration</h2>
+<form action="/migration" method="GET">
+  <label>URL</label>
+  <input type="text" name="url" value="<%= searchOptions.url %>">
+  <button type="submit">Search</button>
 </form>
+<br>
+<div>
+  <% migrations.forEach(migration => { %>
+    <div><%= migration.url %></div>
+  <% }) %>
+</div>

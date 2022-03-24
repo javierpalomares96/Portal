@@ -1,0 +1,29 @@
+<h2>Search Deployment</h2>
+<form action="/deployment" method="GET">
+    <div>
+        <label>URL</label>
+        <input type="text" name="url" value="<%= searchOptions.url %>">
+    </div>
+    <div>
+        <label>name</label>
+        <input type="text" name="name" value="<%= searchOptions.name %>">
+    </div>
+    <div>
+        <label>Deployed Before</label>
+        <input type="date" name="deployedBefore" value="<%= searchOptions.deployedBefore %>">
+    </div>
+    <div>
+        <label>Deployed After</label>
+        <input type="date" name="deployedAfter" value="<%= searchOptions.deployedAfter %>">
+    </div>  
+  <button type="submit">Search</button>
+</form>
+<br>
+<div>
+    <% deployments.forEach(deployment => { %>
+        <div>
+            <%= deployment.url + "      " + deployment.name %>
+            <a href="/deployment/show/<%=deployment.id%>">Details</a>
+        </div>
+    <% }) %>
+</div>

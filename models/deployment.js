@@ -21,6 +21,9 @@ const deploymentSchema = new mongoose.Schema({
     },
     description: {
         type: String 
+    },
+    response: {
+        type: String 
     }
 })
 

@@ -1,0 +1,13 @@
+<h2>Deployment details</h2>
+<div>Name: <%=deployment.name%></div>
+<div>Repo: <%=deployment.url%></div>
+<div>Namespace: <%=deployment.namespace%></div>
+<div>Destination: <%=deployment.destination%></div>
+<div>Description: <%=deployment.description%></div>
+<div>Date of deployment: <%=deployment.dateOfAction.toISOString().split('T')[0]%></div>
+<br>
+<div>Request response: <%=deployment.response%></div>
+<br> 
+<a href="/deployment">Back</a>
+
+

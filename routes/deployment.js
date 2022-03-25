@@ -4,6 +4,7 @@ const router = express.Router()
 
 
 const fetch = require('node-fetch')
+const { response } = require('express')
 
 
 //All Deployment route
@@ -37,14 +38,11 @@ router.get('/new', async (req,res) => {
     renderNewPage(res, new Deployment())
 })
 
-//Deployment result by
-router.get('/show/:id', async (req,res) => {
-    //res.send('Show details')
-    
+//Deployment details
+router.get('/show/:id', async (req,res) => {  
     try{
         const deployment = await Deployment.findById(req.params.id)
-
-        res.render('deployment/details', {
+        res.render('deployment/result', {
             deployment: deployment,
         })
     }catch{
@@ -55,7 +53,6 @@ router.get('/show/:id', async (req,res) => {
 
 //Deployment result by
 router.get('/:id', async (req,res) => {
-    console.log('GET by id')
 
     let dirLE = "http://master-cluster2:30442/api/v1/appmanager/repos"
     let dirpost = "http://master-cluster2:30442/api/v1/appmanager/namespaces/default/apps"
@@ -70,7 +67,7 @@ router.get('/:id', async (req,res) => {
                 "bodytosend":bodytosend}`
     
     let bodyToSendMTO = ``
-    
+    let data = []
     try{
         const deployment = await Deployment.findById(req.params.id)
         const rawResponse = await fetch(dirpost, {
@@ -80,35 +77,41 @@ router.get('/:id', async (req,res) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                release_name: 'pruebaportaldf',
+                release_name: deployment.name,
                 repochart_name: 'bitnami/nginx',
             })
         })
+        data = await rawResponse.text()
         
-        const content = await rawResponse.json();
-
-        console.log(JSON.stringify(content));
+        if(data === ''){
+            data = `{
+                "title": "Deployed Successfully",
+                "status_code": 201,
+                "detail": "App deployed successfully"
+            }`
+        }
+            
+        deployment.response = data
+        const newDeployment = await deployment.save()
 
         res.render('deployment/result', {
-            deployment: deployment,
-            content: JSON.stringify(content)
+            deployment: newDeployment,
         })
     }catch{
-        console.log('error')
         res.redirect('/deployment')
     }
 })
 
 //Create deployment
 router.post('/', async (req,res) => {
-    console.log('POST')
     const deployment = new Deployment({
-        url: req.body.url,
-        name: req.body.name,
-        namespace: req.body.namespace,
-        destination: req.body.destination, 
+        url: req.body.url.toLowerCase(),
+        name: req.body.name.toLowerCase(),
+        namespace: req.body.namespace.toLowerCase(),
+        destination: req.body.destination.toLowerCase(), 
         dateOfAction: new Date(req.body.depDate),
-        description: req.body.description
+        description: req.body.description,
+        response: req.body.response
     })
 
     try {

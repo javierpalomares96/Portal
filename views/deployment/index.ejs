@@ -24,6 +24,7 @@
         <div>
             <%= deployment.url + "      " + deployment.name %>
             <a href="/deployment/show/<%=deployment.id%>">Details</a>
+            <%- include('../partials/deleteForm', {url: `/deployment/${deployment.id}`}) %> 
         </div>
     <% }) %>
 </div>

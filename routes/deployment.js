@@ -1,11 +1,8 @@
 const express = require('express')
 const Deployment = require('../models/deployment')
 const router = express.Router()
-
-
 const fetch = require('node-fetch')
-const { response } = require('express')
-
+const deployment = require('../models/deployment')
 
 //All Deployment route
 router.get('/', async (req,res) => {
@@ -57,30 +54,41 @@ router.get('/:id', async (req,res) => {
     let dirLE = "http://master-cluster2:30442/api/v1/appmanager/repos"
     let dirpost = "http://master-cluster2:30442/api/v1/appmanager/namespaces/default/apps"
     let dirMEO1 = "http://master-cluster2:30442/api/v1/appmanager/repos"
-    let dirMEO2 = "http://master-cluster2:30442/api/v1/appmanager/repos"
+    let dirMEO2 = "http://worker-cluster2:5000/apps/"
     let dirMTO = "http://master-cluster2:30442/api/v1/appmanager/repos"
 
-    let bodyMTO = `{"task": "mecpm",
-                "rabbitmq": {}, 
-                "command": {"action": "deploy", 
-                            "namespace": "test"},
-                "bodytosend":bodytosend}`
-    
-    let bodyToSendMTO = ``
     let data = []
     try{
         const deployment = await Deployment.findById(req.params.id)
-        const rawResponse = await fetch(dirpost, {
+        const inputbody = {
+            "release_name": "pruebamigrate22",
+            "repochart_name": "bitnami/nginx",
+            "values": {
+                "useCustomContent": "Yes",
+                "websiteData": {
+                    "index.html": "goodbye!"
+                }
+            }
+        }
+
+        const rawResponse = await fetch(dirMEO2, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
+            
             body: JSON.stringify({
-                release_name: deployment.name,
-                repochart_name: 'bitnami/nginx',
+                task: 'mecpm', // indica que es una acción para el MEC platform manager
+                rabbitmq: {}, // dejas la key de rabbitmq vacia, tal cual está aquí
+                command: {
+                    'action': 'deploy', 
+                    'namespace': deployment.namespace,
+                },
+                bodytosend: inputbody
             })
         })
+        
         data = await rawResponse.text()
         
         if(data === ''){
@@ -99,6 +107,24 @@ router.get('/:id', async (req,res) => {
         })
     }catch{
         res.redirect('/deployment')
+    }
+})
+
+//Deployment delete details
+router.delete('/:id', async (req,res) => {
+    let Deployment
+    try{
+        deployment = await Deployment.findById(req.params.id)
+        await deployment.remove()
+        res.redirect('/')
+    }catch{
+        if(deployment == null){
+            res.redirect('/')
+        } else{
+            console.log('im here')
+            res.redirect(`/deployment/${deployment.id}`)
+        }
+
     }
 })
 
